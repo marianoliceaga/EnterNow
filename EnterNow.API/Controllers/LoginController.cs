@@ -23,16 +23,10 @@ namespace EnterNow.API.Controllers
             _configuration = configuration;
         }
 
-        public class LoginModel
-        {
-            public string Username { get; set; }
-            public string Password { get; set; }
-        }
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var user = await _userManager.FindByNameAsync(model.Username); // Assuming email is the username
+            var user = await _userManager.FindByNameAsync(model.Username);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
                 return Unauthorized();
 
@@ -53,8 +47,9 @@ namespace EnterNow.API.Controllers
             {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("membershipExpiry", user.MembershipExpiry.ToString())
-        };
+            new Claim("membershipExpiry", user.MembershipExpiry.ToString()),
+            new Claim("isPaymentCurrent", user.IsPaymentCurrent.ToString())
+            };
 
             var token = new JwtSecurityToken(
                 jwtSettings["Issuer"],
@@ -65,6 +60,12 @@ namespace EnterNow.API.Controllers
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public class LoginModel
+        {
+            public string Username { get; set; }
+            public string Password { get; set; }
         }
     }
 }

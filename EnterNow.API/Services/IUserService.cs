@@ -11,5 +11,6 @@ namespace EnterNow.API.Services
         Task<bool> CreateUser(ApplicationUser user, string password);
         Task<bool> UpdateUser(ApplicationUser user);
         Task<bool> DeleteUser(string userId);
+        Task<ApplicationUser> ChangePassword(string userId, string currentPassword, string newPassword);
     }
 }

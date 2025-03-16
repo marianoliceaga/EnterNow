@@ -24,8 +24,8 @@ namespace EnterNow.API.Controllers
         [HttpGet("generate-qr")]
         public async Task<IActionResult> GenerateQr()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await _userManager.FindByIdAsync(userId);
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            ApplicationUser user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 return Unauthorized();
 

@@ -74,6 +74,14 @@ namespace EnterNow.API.Controllers
 
             return Ok("User deleted successfully");
         }
+
+        [HttpPost("{userId}/{currentPassword}/{newPassword}/change-password")]
+        public async Task<IActionResult> ChangePassword(string userId, string currentPassword, string newPassword)
+        {
+            var result = await _userService.ChangePassword(userId, currentPassword, newPassword);
+            if (result == null) return BadRequest("Password change failed");
+            return Ok(result);
+        }
     }
 
     public class CreateUserRequest
