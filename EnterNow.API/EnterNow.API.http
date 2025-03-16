@@ -1,0 +1,6 @@
+@EnterNow.API_HostAddress = http://localhost:5122
+
+GET {{EnterNow.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
