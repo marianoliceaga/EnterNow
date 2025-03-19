@@ -1,110 +1,25 @@
-﻿@page "/users"
-@inject HttpClient Http
+﻿@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject CustomAuthStateProvider AuthStateProvider
 
-<h3>Manage Users</h3>
-
-<button @onclick="LoadUsers">Refresh Users</button>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Membership Expiry</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in users)
-        {
-            <tr>
-                <td>@user.Username</td>
-                <td>@user.Email</td>
-                <td>@user.PhoneNumber</td>
-                <td>@user.MembershipExpiry.ToString("yyyy-MM-dd")</td>
-                <td>
-                    <button @onclick="() => EditUser(user)">Edit</button>
-                    <button @onclick="() => DeleteUser(user.Id)">Delete</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<h3>@(editingUser.Id == null ? "Create User" : "Edit User")</h3>
-<input @bind="editingUser.Username" placeholder="Username" />
-<input @bind="editingUser.Email" placeholder="Email" />
-<input @bind="editingUser.PhoneNumber" placeholder="Phone" />
-<input type="date" @bind="editingUser.MembershipExpiry" />
-<input type="checkbox" @bind="editingUser.IsPaymentCurrent" /> Paid?
-
-@if (editingUser.Id == null)
-{
-    <input @bind="editingUser.Password" placeholder="Password" type="password" />
-    <button @onclick="CreateUser">Create</button>
-}
-else
-{
-    <button @onclick="UpdateUser">Update</button>
-}
+<h3>Login</h3>
+<input @bind="username" placeholder="Username" />
+<input @bind="password" type="password" placeholder="Password" />
+<button @onclick="LoginUser">Login</button>
 
 @code {
-    private List<UserDto> users = new();
-    private UserDto editingUser = new();
+    private string username;
+    private string password;
 
-    private async Task LoadUsers()
+    private async Task LoginUser()
     {
-        users = await Http.GetFromJsonAsync<List<UserDto>>($"{Environment.GetEnvironmentVariable("apiHost")}/api/users");
-    }
-
-    private async Task CreateUser()
-    {
-        await Http.PostAsJsonAsync($"{Environment.GetEnvironmentVariable("apiHost")}/api/users", editingUser);
-        editingUser = new UserDto();
-        await LoadUsers();
-    }
-
-    private async Task UpdateUser()
-    {
-        await Http.PutAsJsonAsync($"{Environment.GetEnvironmentVariable("apiHost")}/api/users/{editingUser.Id}", editingUser);
-        editingUser = new UserDto();
-        await LoadUsers();
-    }
-
-    private async Task DeleteUser(string userId)
-    {
-        await Http.DeleteAsync($"{Environment.GetEnvironmentVariable("apiHost")}/api/users/{userId}");
-        await LoadUsers();
-    }
-
-    // private async Task asd()
-    // {
-    //     await Http.PatchAsync($"{Environment.GetEnvironmentVariable("apiHost")}/api/users/{editingUser.Id}");
-    //     await LoadUsers();
-    // }
-
-    private void EditUser(UserDto user)
-    {
-        editingUser = new UserDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                MembershipExpiry = user.MembershipExpiry,
-                IsPaymentCurrent = user.IsPaymentCurrent
-            };
-    }
-
-    private class UserDto
-    {
-        public string Id { get; set; }
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
-        public DateTime MembershipExpiry { get; set; }
-        public bool IsPaymentCurrent { get; set; }
-        public string Password { get; set; }
+        var response = await Http.PostAsJsonAsync($"{ Environment.GetEnvironmentVariable("apiHost")}/api/login", new { Username = username, Password = password });
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<dynamic>();
+            string token = result?.Token;
+            AuthStateProvider.SetToken(token);
+            Navigation.NavigateTo("/qrcode");
+        }
     }
 }

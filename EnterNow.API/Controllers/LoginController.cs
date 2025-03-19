@@ -45,10 +45,10 @@ namespace EnterNow.API.Controllers
 
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("membershipExpiry", user.MembershipExpiry.ToString()),
-            new Claim("isPaymentCurrent", user.IsPaymentCurrent.ToString())
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("membershipExpiry", user.MembershipExpiry.ToString()),
+                new Claim("isPaymentCurrent", user.IsPaymentCurrent.ToString())
             };
 
             var token = new JwtSecurityToken(

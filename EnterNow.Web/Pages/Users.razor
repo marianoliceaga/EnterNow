@@ -55,26 +55,26 @@ else
 
     private async Task LoadUsers()
     {
-        users = await Http.GetFromJsonAsync<List<UserDto>>("https://localhost:5001/api/users");
+        users = await Http.GetFromJsonAsync<List<UserDto>>($"{Environment.GetEnvironmentVariable("apiHost")}/api/users");
     }
 
     private async Task CreateUser()
     {
-        await Http.PostAsJsonAsync("https://localhost:5001/api/users", editingUser);
+        await Http.PostAsJsonAsync($"{Environment.GetEnvironmentVariable("apiHost")}/api/users", editingUser);
         editingUser = new UserDto();
         await LoadUsers();
     }
 
     private async Task UpdateUser()
     {
-        await Http.PutAsJsonAsync($"https://localhost:5001/api/users/{editingUser.Id}", editingUser);
+        await Http.PutAsJsonAsync($"{Environment.GetEnvironmentVariable("apiHost")}/api/users/{editingUser.Id}", editingUser);
         editingUser = new UserDto();
         await LoadUsers();
     }
 
     private async Task DeleteUser(string userId)
     {
-        await Http.DeleteAsync($"https://localhost:5001/api/users/{userId}");
+        await Http.DeleteAsync($"{Environment.GetEnvironmentVariable("apiHost")}/api/users/{userId}");
         await LoadUsers();
     }
 
