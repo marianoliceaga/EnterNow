@@ -7,9 +7,8 @@ using System.Security.Claims;
 
 namespace EnterNow.API.Controllers
 {
-    [Route("api/qr")]
-    [ApiController]
-    [Authorize]
+    [Route("api/[controller]/[action]")]
+    //[Authorize]
     public class QRServiceController : Controller
     {
         private readonly IQrCodeService _qrCodeService;
@@ -21,7 +20,7 @@ namespace EnterNow.API.Controllers
             _userManager = userManager;
         }
 
-        [HttpGet("generate-qr")]
+        [HttpGet()]
         public async Task<IActionResult> GenerateQr()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -36,7 +35,7 @@ namespace EnterNow.API.Controllers
             return Ok(new { QrCodeImage = $"data:image/png;base64,{qrCodeBase64}" });
         }
 
-        [HttpPost("validate-qr")]
+        [HttpPost()]
         public IActionResult ValidateQr([FromBody] ValidateQrRequest request)
         {
             bool isValid = _qrCodeService.ValidateQrCode(request.QrCodeData);
